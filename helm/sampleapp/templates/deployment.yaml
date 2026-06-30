@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-pipeline-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins-pipeline-demo
+  template:
+    metadata:
+      labels:
+        app: jenkins-pipeline-demo
+    spec:
+      containers:
+        - name: jenkins-pipeline-demo
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 80
