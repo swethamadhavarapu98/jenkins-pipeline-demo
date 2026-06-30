@@ -1,9 +1,12 @@
+@Library('jenkins-shared-library') _
+
 pipeline {
     agent any
 
     environment {
         IMAGE_NAME = 'swethamadhavarapu/jenkins-pipeline-demo'
         IMAGE_TAG = 'latest'
+        DOCKER_CREDENTIALS_ID = '50ef8f04-9dde-499d-acf2-036fde0e01c5'
     }
 
     stages {
@@ -15,23 +18,13 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t jenkins-pipeline-demo:latest .'
+                dockerBuild(IMAGE_NAME)
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: '50ef8f04-9dde-499d-acf2-036fde0e01c5',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker tag jenkins-pipeline-demo:latest $IMAGE_NAME:$IMAGE_TAG
-                        docker push $IMAGE_NAME:$IMAGE_TAG
-                    '''
-                }
+                dockerPush(IMAGE_NAME, DOCKER_CREDENTIALS_ID)
             }
         }
 
