@@ -35,23 +35,43 @@ pipeline {
             }
         }
 
-        stage('Deploy to Minikube') {
+        stage('Deploy to DEV') {
             steps {
                 sh '''
-                    helm upgrade --install sampleapp ./helm/sampleapp \
+                    helm upgrade --install sampleapp-dev ./helm/sampleapp \
+                      --namespace dev \
+                      --create-namespace \
                       --set image.repository=$IMAGE_NAME \
-                      --set image.tag=$IMAGE_TAG
+                      --set image.tag=$IMAGE_TAG \
+                      --set service.nodePort=30081
 
-                    kubectl rollout status deployment/jenkins-pipeline-demo --timeout=120s
-                    kubectl get pods
-                    kubectl get svc
+                    kubectl rollout status deployment/jenkins-pipeline-demo -n dev --timeout=120s
+                    kubectl get pods -n dev
+                    kubectl get svc -n dev
                 '''
             }
         }
 
-        stage('Approval Before Test') {
+        stage('Approval Before PROD') {
             steps {
-                input message: 'Approve to continue after Minikube deployment?', ok: 'Approve'
+                input message: 'Approve deployment to PROD?', ok: 'Deploy to PROD'
+            }
+        }
+
+        stage('Deploy to PROD') {
+            steps {
+                sh '''
+                    helm upgrade --install sampleapp-prod ./helm/sampleapp \
+                      --namespace prod \
+                      --create-namespace \
+                      --set image.repository=$IMAGE_NAME \
+                      --set image.tag=$IMAGE_TAG \
+                      --set service.nodePort=30082
+
+                    kubectl rollout status deployment/jenkins-pipeline-demo -n prod --timeout=120s
+                    kubectl get pods -n prod
+                    kubectl get svc -n prod
+                '''
             }
         }
 
