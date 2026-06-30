@@ -39,6 +39,7 @@ pipeline {
             steps {
                 sh 'docker rm -f jenkins-pipeline-demo || true'
                 sh 'docker run -d -p 8082:80 --name jenkins-pipeline-demo $IMAGE_NAME:$IMAGE_TAG'
+                sh 'sleep 5'
                 sh 'curl -I http://localhost:8082'
             }
         }
