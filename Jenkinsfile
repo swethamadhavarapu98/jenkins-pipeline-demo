@@ -1,31 +1,15 @@
-pipeline {
-    agent any
-
-    stages {
-        stage('Checkout') {
-            steps {
-                echo 'Code checked out from GitHub'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t jenkins-pipeline-demo:latest .'
-            }
-        }
-
-        stage('Run Container Test') {
-            steps {
-                sh 'docker rm -f jenkins-pipeline-demo || true'
-                sh 'docker run -d -p 8082:80 --name jenkins-pipeline-demo jenkins-pipeline-demo:latest'
-                sh 'curl -I http://localhost:8082'
-            }
-        }
-    }
-
-    post {
-        always {
-            sh 'docker rm -f jenkins-pipeline-demo || true'
+stage('Push to Docker Hub') {
+    steps {
+        withCredentials([usernamePassword(
+            credentialsId: '50e8f804-9dde-499d-acf2-036fde0e01c5',
+            usernameVariable: 'DOCKER_USER',
+            passwordVariable: 'DOCKER_PASS'
+        )]) {
+            sh '''
+                docker login -u $DOCKER_USER -p $DOCKER_PASS
+                docker tag jenkins-pipeline-demo:latest swethamadhavarapu/jenkins-pipeline-demo:latest
+                docker push swethamadhavarapu/jenkins-pipeline-demo:latest
+            '''
         }
     }
 }
