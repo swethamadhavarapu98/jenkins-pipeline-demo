@@ -49,6 +49,12 @@ pipeline {
             }
         }
 
+        stage('Approval Before Test') {
+            steps {
+                input message: 'Approve to continue after Minikube deployment?', ok: 'Approve'
+            }
+        }
+
         stage('Run Container Test') {
             steps {
                 sh 'docker rm -f jenkins-pipeline-demo || true'
