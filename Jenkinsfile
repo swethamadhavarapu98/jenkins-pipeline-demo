@@ -3,10 +3,6 @@
 pipeline {
     agent any
 
-    tools {
-        sonarQubeScanner 'SonarScanner'
-    }
-
     environment {
         IMAGE_NAME = 'swethamadhavarapu/jenkins-pipeline-demo'
         IMAGE_TAG = 'latest'
@@ -29,8 +25,11 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonarqube') {
-                    sh 'sonar-scanner'
+                script {
+                    def scannerHome = tool 'SonarScanner'
+                    withSonarQubeEnv('sonarqube') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
                 }
             }
         }
