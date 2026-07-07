@@ -5,11 +5,18 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'swethamadhavarapu/jenkins-pipeline-demo'
-        IMAGE_TAG = 'latest'
+        IMAGE_TAG = "${BUILD_NUMBER}"
         DOCKER_CREDENTIALS_ID = '50ef8f04-9dde-499d-acf2-036fde0e01c5'
     }
 
     stages {
+
+        stage('Generate Tag') {
+            steps {
+                echo "Generated Docker image tag: ${IMAGE_TAG}"
+            }
+        }
+
         stage('Checkout') {
             steps {
                 echo 'Code checked out from GitHub'
