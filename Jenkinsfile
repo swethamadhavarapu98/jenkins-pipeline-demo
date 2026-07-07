@@ -5,7 +5,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'swethamadhavarapu/jenkins-pipeline-demo'
-        IMAGE_TAG = "${BUILD_NUMBER}"
+        IMAGE_TAG = 'latest'
         DOCKER_CREDENTIALS_ID = '50ef8f04-9dde-499d-acf2-036fde0e01c5'
     }
 
