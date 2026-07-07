@@ -3,6 +3,10 @@
 pipeline {
     agent any
 
+    tools {
+        sonarQubeScanner 'SonarScanner'
+    }
+
     environment {
         IMAGE_NAME = 'swethamadhavarapu/jenkins-pipeline-demo'
         IMAGE_TAG = 'latest'
@@ -20,6 +24,22 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Code checked out from GitHub'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    sh 'sonar-scanner'
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
 
